@@ -1134,6 +1134,39 @@ namespace hw {
         return true;
     }
 
+    bool device_ledger::encrypt_payment_id(crypto::hash &payment_id, const crypto::public_key &public_key, const crypto::secret_key &secret_key) {
+        AUTO_LOCK_CMD();
+
+        #ifdef DEBUG_HWDEVICE
+        const crypto::public_key public_key_x = public_key;
+        const crypto::secret_key secret_key_x = hw::ledger::decrypt(secret_key);
+        crypto::hash payment_id_x = payment_id;
+        this->controle_device->encrypt_payment_id(payment_id_x, public_key_x, secret_key_x);
+        #endif
+
+        int offset = set_command_header_noopt(INS_STEALTH);
+        //pub
+        memmove(&this->buffer_send[offset], public_key.data, 32);
+        offset += 32;
+        //sec
+        memmove(&this->buffer_send[offset], secret_key.data, 32);
+        offset += 32;
+        //id
+        memmove(&this->buffer_send[offset], payment_id.data, 32);
+        offset += 32;
+
+        this->buffer_send[4] = offset-5;
+        this->length_send = offset;
+        this->exchange();
+        memmove(payment_id.data, &this->buffer_recv[0], 32);
+
+        #ifdef DEBUG_HWDEVICE
+        hw::ledger::check32("stealth", "payment_id", payment_id_x.data, payment_id.data);
+        #endif
+
+        return true;
+    }
+
     bool device_ledger::encrypt_payment_id(crypto::hash8 &payment_id, const crypto::public_key &public_key, const crypto::secret_key &secret_key) {
         AUTO_LOCK_CMD();
 

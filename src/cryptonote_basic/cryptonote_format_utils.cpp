@@ -697,6 +697,14 @@ namespace cryptonote
     std::copy(payment_id_ptr, payment_id_ptr + sizeof(payment_id), std::back_inserter(extra_nonce));
   }
   //---------------------------------------------------------------
+  void set_encrypted_payment_id_to_tx_extra_nonce(blobdata& extra_nonce, const crypto::hash& payment_id)
+  {
+    extra_nonce.clear();
+    extra_nonce.push_back(TX_EXTRA_NONCE_ENCRYPTED_PAYMENT_ID);
+    const uint8_t* payment_id_ptr = reinterpret_cast<const uint8_t*>(&payment_id);
+    std::copy(payment_id_ptr, payment_id_ptr + sizeof(payment_id), std::back_inserter(extra_nonce));
+  }
+  //---------------------------------------------------------------
   void set_encrypted_payment_id_to_tx_extra_nonce(blobdata& extra_nonce, const crypto::hash8& payment_id)
   {
     extra_nonce.clear();

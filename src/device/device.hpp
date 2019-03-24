@@ -213,6 +213,7 @@ namespace hw {
 
         virtual bool  open_tx(crypto::secret_key &tx_key) = 0;
 
+        virtual bool  encrypt_payment_id(crypto::hash &payment_id, const crypto::public_key &public_key, const crypto::secret_key &secret_key) = 0;
         virtual bool  encrypt_payment_id(crypto::hash8 &payment_id, const crypto::public_key &public_key, const crypto::secret_key &secret_key) = 0;
         bool  decrypt_payment_id(crypto::hash8 &payment_id, const crypto::public_key &public_key, const crypto::secret_key &secret_key)
         {

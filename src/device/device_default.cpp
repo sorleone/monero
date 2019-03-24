@@ -331,6 +331,24 @@ namespace hw {
             return r;
         }
 
+        bool device_default::encrypt_payment_id(crypto::hash &payment_id, const crypto::public_key &public_key, const crypto::secret_key &secret_key) {
+            crypto::key_derivation derivation;
+            crypto::hash hash;
+            char data[33]; /* A hash, and an extra byte */
+
+            if (!generate_key_derivation(public_key, secret_key, derivation))
+                return false;
+
+            memcpy(data, &derivation, 32);
+            data[32] = ENCRYPTED_PAYMENT_ID_TAIL;
+            cn_fast_hash(data, 33, hash);
+
+            for (size_t b = 0; b < 32; ++b)
+                payment_id.data[b] ^= hash.data[b];
+
+            return true;
+        }
+
         bool  device_default::encrypt_payment_id(crypto::hash8 &payment_id, const crypto::public_key &public_key, const crypto::secret_key &secret_key) {
             crypto::key_derivation derivation;
             crypto::hash hash;
